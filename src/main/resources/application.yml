@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: financial-comments-service
+  datasource:
+    url: jdbc:h2:mem:financial_comments_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+resilience4j:
+  circuitbreaker:
+    instances:
+      commentService:
+        registerHealthIndicator: true
+        failureRateThreshold: 50
+        waitDurationInOpenState: 5000
+        slidingWindowSize: 10
+
+logging:
+  level:
+    root: INFO
+    com.financial.comments: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
